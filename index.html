@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eNoah Timesheet System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="screen active">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="logo-section">
+                    <div class="logo-circle">
+                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 30 L80 30 L80 40 L30 40 L30 50 L70 50 L70 60 L30 60 L30 70 L80 70 L80 80 L20 80 Z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <h1 class="app-title">eNoah Timesheet</h1>
+                    <p class="app-subtitle">Secure Time Tracking System</p>
+                </div>
+                
+                <form id="emailForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="loginEmail">eNoah Email Address</label>
+                        <input 
+                            type="email" 
+                            id="loginEmail" 
+                            name="email" 
+                            placeholder="your.name@enoahisolution.com"
+                            required
+                            pattern=".*@enoahisolution\.(com|co\.in|com\.au)$"
+                        >
+                        <span class="error-message" id="emailError"></span>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <span>Send OTP</span>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M4 10h12m-5-5l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTP Verification Screen -->
+    <div id="otpScreen" class="screen">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="logo-section">
+                    <div class="logo-circle small">
+                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M50 30 L50 50 L70 50" stroke="currentColor" stroke-width="8" stroke-linecap="round" fill="none"/>
+                            <circle cx="50" cy="50" r="25" stroke="currentColor" stroke-width="6" fill="none"/>
+                        </svg>
+                    </div>
+                    <h2 class="verify-title">Verify Your Email</h2>
+                    <p class="verify-subtitle">Enter the 6-digit code sent to <strong id="sentToEmail"></strong></p>
+                </div>
+                
+                <form id="otpForm" class="auth-form">
+                    <div class="otp-inputs">
+                        <input type="text" maxlength="1" class="otp-digit" data-index="0" autocomplete="off">
+                        <input type="text" maxlength="1" class="otp-digit" data-index="1" autocomplete="off">
+                        <input type="text" maxlength="1" class="otp-digit" data-index="2" autocomplete="off">
+                        <input type="text" maxlength="1" class="otp-digit" data-index="3" autocomplete="off">
+                        <input type="text" maxlength="1" class="otp-digit" data-index="4" autocomplete="off">
+                        <input type="text" maxlength="1" class="otp-digit" data-index="5" autocomplete="off">
+                    </div>
+                    <span class="error-message" id="otpError"></span>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <span>Verify & Continue</span>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M6 10l3 3 5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    
+                    <button type="button" class="btn-link" id="resendOtp">
+                        Resend OTP <span id="resendTimer"></span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timesheet Screen -->
+    <div id="timesheetScreen" class="screen">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="logo-circle mini">
+                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 30 L80 30 L80 40 L30 40 L30 50 L70 50 L70 60 L30 60 L30 70 L80 70 L80 80 L20 80 Z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="header-title">Timesheet</h1>
+                        <p class="header-subtitle" id="userEmail"></p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="btn btn-secondary" id="viewEntriesBtn">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <span>View Entries</span>
+                    </button>
+                    <button class="btn btn-ghost" id="logoutBtn">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M13 3h3a2 2 0 012 2v10a2 2 0 01-2 2h-3m-7-4l-4-4m0 0l4-4m-4 4h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="timesheet-container">
+                <!-- Entry Type Selection -->
+                <div class="entry-type-selector" style="display: none;">
+                    <button class="entry-type-btn active" data-type="work">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" stroke-width="2"/>
+                            <path d="M8 6V4M16 6V4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <span>Work Entry</span>
+                    </button>
+                    <button class="entry-type-btn" data-type="leave">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M19 4H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zM9 11h6M9 15h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Leave / Holiday</span>
+                    </button>
+                </div>
+
+                <form id="timesheetForm" class="timesheet-form">
+                    <!-- Entry Type Buttons and Date in Single Line -->
+                    <div class="form-section">
+                        <div class="entry-type-date-row">
+                            <div class="entry-type-selector-inline">
+                                <button class="entry-type-btn-small active" data-type="work" type="button">
+                                    <span>Work</span>
+                                </button>
+                                <button class="entry-type-btn-small" data-type="leave" type="button">
+                                    <span>Leave</span>
+                                </button>
+                            </div>
+                            <div class="form-group" style="margin: 0;">
+                                <label for="entryDate">Date:</label>
+                                <input type="date" id="entryDate" name="entryDate" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Work Entry Fields -->
+                    <div id="workFields" class="conditional-fields">
+                        <div class="form-section">
+                            <h3 class="section-title">Timesheet Entries - <span id="selectedDay"></span></h3>
+                            
+                            <div class="timesheet-table-wrapper">
+                                <table class="timesheet-table" id="timesheetTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Project</th>
+                                            <th>Task</th>
+                                            <th>Billing Type</th>
+                                            <th>Work Description</th>
+                                            <th>Hours</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="timesheetBody">
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="4" style="text-align: right; font-weight: bold;">Total Hours:</td>
+                                            <td style="font-weight: bold; text-align: center;"><span id="totalHours">0</span></td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            
+                            <button type="button" class="add-row-btn" id="addRowBtn">+ Add Row</button>
+                        </div>
+                    </div>
+
+                    <!-- Leave Entry Fields -->
+                    <div id="leaveFields" class="conditional-fields" style="display: none;">
+                        <div class="form-section">
+                            <h3 class="section-title">Leave Details</h3>
+                            <div class="leave-fields-single-row">
+                                <div class="form-group">
+                                    <label for="leaveType">Leave Type *</label>
+                                    <select id="leaveType" name="leaveType">
+                                        <option value="">Select Leave Type</option>
+                                        <option value="Sick Leave">Sick Leave</option>
+                                        <option value="Casual Leave">Casual Leave</option>
+                                        <option value="National Holiday">National Holiday</option>
+                                        <option value="Festival Holiday">Festival Holiday</option>
+                                    </select>
+                                    <span class="error-message" id="leaveTypeError"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="session">Session *</label>
+                                    <select id="session" name="session">
+                                        <option value="">Select Session</option>
+                                        <option value="Full Day (8 hrs)">Full Day (8 hrs)</option>
+                                        <option value="Half Day (4 hrs)">Half Day (4 hrs)</option>
+                                    </select>
+                                    <span class="error-message" id="sessionError"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="leaveFromDate">From Date *</label>
+                                    <input type="date" id="leaveFromDate" name="leaveFromDate">
+                                    <span class="error-message" id="leaveFromDateError"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="leaveToDate">To Date *</label>
+                                    <input type="date" id="leaveToDate" name="leaveToDate">
+                                    <span class="error-message" id="leaveToDateError"></span>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                            <div class="form-group full-width" style="margin-bottom: 0;">
+                                <label for="leaveDescription">Description *</label>
+                                <textarea id="leaveDescription" name="leaveDescription" rows="3" placeholder="Enter leave description"></textarea>
+                                <span class="error-message" id="leaveDescriptionError"></span>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-ghost" id="resetBtn">Reset</button>
+                        <button type="button" class="btn btn-secondary" id="saveBtn">Save Changes</button>
+                        <button type="submit" class="btn btn-primary">
+                            <span>Submit</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- View Entries Modal -->
+    <div id="entriesModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2>Your Timesheet Entries</h2>
+                <button class="modal-close" id="closeModalBtn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="filter-section">
+                    <div class="filter-group">
+                        <label>Filter by Entry Type</label>
+                        <div class="filter-row">
+                            <select id="entryTypeFilter" class="filter-input">
+                                <option value="all">All Entries</option>
+                                <option value="Work">Work Only</option>
+                                <option value="Leave">Leave Only</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div id="entriesTable" class="entries-table-container">
+                    <div class="loading">Loading entries...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
