@@ -7,7 +7,7 @@ const CONFIG = {
     // 1. Create a Google Apps Script project (instructions in SETUP.md)
     // 2. Deploy as Web App
     // 3. Copy the deployment URL here
-    GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbx-75pnA3xslsDb4aa5gamh9QY9M5uEDkzd_hXJp69UV9B-p03_MoWer3Jxe_EtO-tL/exec',
+    GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxYltsrFU4TPRkYHWowVpYUTWf4eK2srhoxHm6px3a7NPP3msvb5NPEoKlGHB_ehwk17Q/exec',
     
     // Email Configuration for OTP
     // The Google Apps Script will handle sending emails
